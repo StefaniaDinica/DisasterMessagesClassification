@@ -36,6 +36,12 @@ def clean_data(df):
         # convert column from string to numeric
         categories[column] = pd.to_numeric(categories[column])
 
+    # 'related' category has 0, 1 and 2 values -> replace 2 values with 1 values
+    categories['related'] = categories['related'].apply(lambda x: 1 if x == 2 else x)
+
+    # 'child_alone' category has only 0 value -> drop column
+    categories = categories.drop(columns=['child_alone'])
+
     # drop the original categories column from `df`
     df = df.drop(columns=["categories"])
 
@@ -50,7 +56,9 @@ def clean_data(df):
 
 def save_data(df, database_filename):
     engine = create_engine('sqlite:///' + database_filename)
-    df.to_sql('InsertTableName', engine, index=False)
+
+    # !!! maybe add an if_exists=
+    df.to_sql('InsertTableName', engine, index=False, if_exists='replace')
 
 
 def main():
