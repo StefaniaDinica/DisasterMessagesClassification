@@ -20,8 +20,17 @@ from custom_transformers.WordsCount import WordsCount
 from custom_transformers.CapitalWordsCount import CapitalWordsCount
 from utils import tokenize
 
-
 def load_data(database_filepath):
+    '''Reads data from the database and loads it into dataframes
+    
+    Args:
+    database_filepath (string) - path to the database file
+
+    Returns:
+    X - dataframe containing 'message' column;
+    Y - dataframe containing all categories columns;
+    category_names - list with all the categories names
+    '''
     engine = create_engine('sqlite:///' + database_filepath)
     df = pd.read_sql_table('InsertTableName', con=engine.connect())
 
@@ -32,6 +41,14 @@ def load_data(database_filepath):
     return X, Y, category_names
 
 def build_model():
+    '''Builds the model using a Pipeline consisting of TfidfVectorizer, MultiOutputClassifier, RandomForestClassifier
+    
+    Args:
+    None
+
+    Returns:
+    cv - the model obtained by performing a GridSearchCV over the pipeline
+    '''
     n_cpu = os.cpu_count()
     print("Number of CPUs in the system: %s. Will use %s." % (n_cpu, (n_cpu - 1)))
 
@@ -45,11 +62,12 @@ def build_model():
     ])
 
     parameters = {
-        'clf__estimator__n_estimators': [50, 100, 200],
+        'clf__estimator__n_estimators': [50, 100, 200, 300],
         'clf__estimator__min_samples_split': [2, 5, 10],
         # 'clf__estimator__min_samples_leaf': [1, 2, 4],
-        'clf__estimator__max_depth': [10, 30, 70, None],
-        # 'clf__estimator__bootstrap': [True, False]
+        'clf__estimator__max_depth': [10, 50, None],
+        'clf__estimator__bootstrap': [True, False],
+        'clf__estimator__max_features': ['sqrt', 'log2', None],
     }
 
     print("Parameters: %s" % parameters)
@@ -60,6 +78,17 @@ def build_model():
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    '''Evaluates a model by displaying the classification reports for all the categories
+    
+    Args:
+    model - the model to evaluate
+    X_test - the input dataframe to test
+    Y_test - the output dataframe to test
+    category_names - list containing the names of the categories
+
+    Returns:
+    None
+    '''
     Y_pred = model.predict(X_test)
     Y_pred_df = pd.DataFrame(Y_pred, columns = category_names)
 
@@ -95,6 +124,8 @@ def main():
 
         print('Training model...')
         model.fit(X_train, Y_train)
+
+        print("\n The best parameters across ALL searched params:\n", model.best_params_)
         
         print('Evaluating model...')
         evaluate_model(model, X_test, Y_test, category_names)

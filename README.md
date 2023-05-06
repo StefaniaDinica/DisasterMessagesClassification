@@ -13,3 +13,10 @@
 3. Run your web app: `python run.py`
 
 4. Click the `PREVIEW` button to open the homepage
+
+
+### Notes
+Several tests have been run on the data in order to train a better model. The results of the tests can be found on /tests folder.
+1. GridSearch; RandomForestClassifier; TfidfVectorizer; no custom transformers
+Parameters: {'clf__estimator__n_estimators': [50, 100, 200], 'clf__estimator__min_samples_split': [2, 5, 10], 'clf__estimator__max_depth': [10, 30, 70, None]}
+

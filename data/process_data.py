@@ -22,6 +22,14 @@ def load_data(messages_filepath, categories_filepath):
 
 
 def clean_data(df):
+    '''Performs cleanup on a dataframe
+    
+    Args:
+    df: the dataframe to clean
+
+    Returns:
+    df: the clean dataframe
+    '''
     # create a dataframe of the 36 individual category columns
     categories = df['categories'].str.split(';', expand=True)
 
@@ -60,6 +68,15 @@ def clean_data(df):
 
 
 def save_data(df, database_filename):
+    '''Saves a dataframe to an sqlite database
+
+    Args:
+    df: the dataframe to save;
+    database_filename: the name of the file where the database will be saved
+
+    Returns:
+    None
+    '''
     engine = create_engine('sqlite:///' + database_filename)
 
     df.to_sql('InsertTableName', engine, index=False, if_exists='replace')
