@@ -4,12 +4,19 @@ import numpy as np
 from sqlalchemy import create_engine
 
 def load_data(messages_filepath, categories_filepath):
-    # load datasets
+    '''Reads data from two csv files, merges the data and returns the data as a dataframe
+    
+    Args:
+    messages_filepath (string): path to messages csv file;
+    categories_filepath (string): path to categories file
+
+    Returns:
+    df - pandas dataframe
+    '''
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
     
-    # merge datasets
-    df = messages.merge(categories, on=["id"])
+    df = messages.merge(categories, on=['id'])
 
     return df
 
@@ -22,8 +29,6 @@ def clean_data(df):
     row = categories.iloc[0,:]
 
     # use this row to extract a list of new column names for categories.
-    # one way is to apply a lambda function that takes everything 
-    # up to the second to last character of each string with slicing
     category_colnames = [item[:-2] for item in row]
 
     # rename the columns of `categories`
@@ -57,7 +62,6 @@ def clean_data(df):
 def save_data(df, database_filename):
     engine = create_engine('sqlite:///' + database_filename)
 
-    # !!! maybe add an if_exists=
     df.to_sql('InsertTableName', engine, index=False, if_exists='replace')
 
 

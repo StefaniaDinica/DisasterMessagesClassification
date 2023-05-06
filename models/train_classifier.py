@@ -1,13 +1,11 @@
 import sys
 from sqlalchemy import create_engine
 import pandas as pd
-import re
-import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.stem.porter import PorterStemmer
-from sklearn.pipeline import Pipeline
+from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.ensemble import RandomForestClassifier
@@ -15,9 +13,13 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from sklearn.model_selection import GridSearchCV
 import joblib
-nltk.download('punkt')
-nltk.download('stopwords')
-nltk.download('wordnet')
+import time
+import os
+from custom_transformers.NounProportion import NounProportion
+from custom_transformers.WordsCount import WordsCount
+from custom_transformers.CapitalWordsCount import CapitalWordsCount
+from utils import tokenize
+
 
 def load_data(database_filepath):
     engine = create_engine('sqlite:///' + database_filepath)
@@ -29,43 +31,30 @@ def load_data(database_filepath):
 
     return X, Y, category_names
 
-
-def tokenize(text):
-    lemmatizer = WordNetLemmatizer()
-    stemmer = PorterStemmer()
-    
-    text = text.lower()
-    text = re.sub("[^a-zA-Z0-9]", " ", text)
-    
-    words_list = word_tokenize(text)
-    stopwords_list = stopwords.words('english')
-    
-    words_list = [word for word in words_list if word not in stopwords_list]
-    
-    words_list = [lemmatizer.lemmatize(word) for word in words_list]
-    words_list = [lemmatizer.lemmatize(word, pos='v') for word in words_list]
-
-    words_list = [stemmer.stem(word) for word in words_list]
-    
-    return words_list
-
-
 def build_model():
+    n_cpu = os.cpu_count()
+    print("Number of CPUs in the system: %s. Will use %s." % (n_cpu, (n_cpu - 1)))
+
     pipeline = Pipeline([
-        ('trans', TfidfVectorizer(tokenizer=tokenize)),
-        ('clf', MultiOutputClassifier(RandomForestClassifier()))
+        ('features', FeatureUnion([
+            ('trans', TfidfVectorizer(tokenizer=tokenize)),
+            # ('nounProportion', NounProportion()),
+            # ('wordsCount', WordsCount())
+        ])),
+        ('clf', MultiOutputClassifier(RandomForestClassifier(n_jobs=n_cpu - 1)))
     ])
 
     parameters = {
-        'clf__estimator__n_estimators': [200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000],
+        'clf__estimator__n_estimators': [50, 100, 200],
         'clf__estimator__min_samples_split': [2, 5, 10],
-        'clf__estimator__min_samples_leaf': [1, 2, 4],
-        'clf__estimator__max_features': ['auto', 'sqrt'],
-        'clf__estimator__max_depth': [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, None],
-        'clf__estimator__bootstrap': [True, False]
+        # 'clf__estimator__min_samples_leaf': [1, 2, 4],
+        'clf__estimator__max_depth': [10, 30, 70, None],
+        # 'clf__estimator__bootstrap': [True, False]
     }
 
-    cv = GridSearchCV(pipeline, param_grid=parameters)
+    print("Parameters: %s" % parameters)
+
+    cv = GridSearchCV(pipeline, param_grid=parameters, cv=2)
 
     return cv
 
@@ -84,15 +73,26 @@ def save_model(model, model_filepath):
 
 
 def main():
-    if len(sys.argv) == 3:
-        database_filepath, model_filepath = sys.argv[1:]
+    if len(sys.argv) >= 3:
+        start_time = time.time()
+
+
+        # nounProportion = CapitalWordsCount()
+        # print('-----')
+        # print(nounProportion.transform(['I am in Romania and starving, at the University we need food and water']))
+
+        database_filepath, model_filepath, test_description = sys.argv[1:]
+        print('Test description:\n')
+        print(test_description)
+        print ('\n\n')
+
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
         X, Y, category_names = load_data(database_filepath)
-        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)
+        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.33)
         
         print('Building model...')
         model = build_model()
-        
+
         print('Training model...')
         model.fit(X_train, Y_train)
         
@@ -103,7 +103,9 @@ def main():
         save_model(model, model_filepath)
 
         print('Trained model saved!')
+        end_time = time.time()
 
+        print('Execution time: %s minutes' % ((end_time - start_time) / 60))
     else:
         print('Please provide the filepath of the disaster messages database '\
               'as the first argument and the filepath of the pickle file to '\
