@@ -103,9 +103,13 @@ def evaluate_model(model, X_test, Y_test, category_names, test_name):
     macro_avg_results = defaultdict(dict)
     weighted_avg_results = defaultdict(dict)
     for column in category_names:
-        report = classification_report(Y_test[column], Y_pred_df[column], output_dict=True)
-        weighted_avg_results[column] = report['weighted avg']
-        macro_avg_results[column] = report['macro avg']
+        report_dict = classification_report(Y_test[column], Y_pred_df[column], output_dict=True)
+        report = classification_report(Y_test[column], Y_pred_df[column])
+
+        report_dict['weighted avg'].pop('support', None)
+        report_dict['macro avg'].pop('support', None)
+        weighted_avg_results[column] = report_dict['weighted avg']
+        macro_avg_results[column] = report_dict['macro avg']
 
         print('Report for ' + column + ' category')
         print(report)
@@ -113,15 +117,13 @@ def evaluate_model(model, X_test, Y_test, category_names, test_name):
     if (test_name == None):
         test_name = 'testUnnamed'
 
-    print('------------')
-    print(weighted_avg_results)
     macro_avg_results_df = pd.DataFrame.from_dict(macro_avg_results, orient='index')
     weighted_avg_results_df = pd.DataFrame.from_dict(weighted_avg_results, orient='index')
 
-    with open('tests/' + test_name + '_weightedAvg', 'w') as fid:
+    with open('tests/' + test_name + '_weightedAvg.md', 'w') as fid:
         print(weighted_avg_results_df.to_markdown(), file=fid)
 
-    with open('tests/' + test_name + '_macroAvg', 'w') as fid:
+    with open('tests/' + test_name + '_macroAvg.md', 'w') as fid:
         print(macro_avg_results_df.to_markdown(), file=fid)
 
 
