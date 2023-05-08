@@ -1,6 +1,5 @@
 import sys
 import pandas as pd
-import numpy as np
 from sqlalchemy import create_engine
 
 def load_data(messages_filepath, categories_filepath):
@@ -79,7 +78,7 @@ def save_data(df, database_filename):
     '''
     engine = create_engine('sqlite:///' + database_filename)
 
-    df.to_sql('InsertTableName', engine, index=False, if_exists='replace')
+    df.to_sql('MessagesCategories', engine, index=False, if_exists='replace')
 
 
 def main():

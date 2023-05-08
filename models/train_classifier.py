@@ -1,10 +1,11 @@
 import sys
 from sqlalchemy import create_engine
 import pandas as pd
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
-from nltk.stem.wordnet import WordNetLemmatizer
-from nltk.stem.porter import PorterStemmer
+import re
+import nltk
+import joblib
+import time
+import os
 from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.multioutput import MultiOutputClassifier
@@ -12,13 +13,18 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from sklearn.model_selection import GridSearchCV
-import joblib
-import time
-import os
-from custom_transformers.NounProportion import NounProportion
-from custom_transformers.WordsCount import WordsCount
-from custom_transformers.CapitalWordsCount import CapitalWordsCount
-from utils import tokenize
+# from ..transformers import NounProportion, CapitalWordsCount, WordsCount
+from nltk.stem.wordnet import WordNetLemmatizer
+from nltk.stem.porter import PorterStemmer
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+nltk.download(['punkt', 'stopwords', 'wordnet', 'averaged_perceptron_tagger'])
+# from ..utils.tokenize import tokenize
+from utils.tokenize import tokenize
+from transformers.CapitalWordsCount import CapitalWordsCount
+from transformers.NounProportion import NounProportion
+from transformers.WordsCount import WordsCount
+from collections import defaultdict
 
 def load_data(database_filepath):
     '''Reads data from the database and loads it into dataframes
@@ -32,7 +38,7 @@ def load_data(database_filepath):
     category_names - list with all the categories names
     '''
     engine = create_engine('sqlite:///' + database_filepath)
-    df = pd.read_sql_table('InsertTableName', con=engine.connect())
+    df = pd.read_sql_table('MessagesCategories', con=engine.connect())
 
     X = df['message']
     Y = df.drop(columns=['id', 'message', 'original', 'genre'])
@@ -55,20 +61,22 @@ def build_model():
     pipeline = Pipeline([
         ('features', FeatureUnion([
             ('trans', TfidfVectorizer(tokenizer=tokenize)),
-            # ('nounProportion', NounProportion()),
-            # ('wordsCount', WordsCount())
+            ('nounProportion', NounProportion()),
+            ('wordsCount', WordsCount()),
+            ('capitalWordsCount', CapitalWordsCount())
         ])),
         ('clf', MultiOutputClassifier(RandomForestClassifier(n_jobs=n_cpu - 1)))
     ])
 
-    parameters = {
-        'clf__estimator__n_estimators': [50, 100, 200, 300],
-        'clf__estimator__min_samples_split': [2, 5, 10],
-        # 'clf__estimator__min_samples_leaf': [1, 2, 4],
-        'clf__estimator__max_depth': [10, 50, None],
-        'clf__estimator__bootstrap': [True, False],
-        'clf__estimator__max_features': ['sqrt', 'log2', None],
-    }
+    # parameters = {
+    #     'clf__estimator__n_estimators': [50, 100, 200, 300],
+    #     'clf__estimator__min_samples_split': [2, 5, 10],
+    #     # 'clf__estimator__min_samples_leaf': [1, 2, 4],
+    #     'clf__estimator__max_depth': [10, 50, None],
+    #     'clf__estimator__bootstrap': [True, False],
+    #     # 'clf__estimator__max_features': ['sqrt', 'log2', None],
+    # }
+    parameters = {}
 
     print("Parameters: %s" % parameters)
 
@@ -77,7 +85,7 @@ def build_model():
     return cv
 
 
-def evaluate_model(model, X_test, Y_test, category_names):
+def evaluate_model(model, X_test, Y_test, category_names, test_name):
     '''Evaluates a model by displaying the classification reports for all the categories
     
     Args:
@@ -92,25 +100,60 @@ def evaluate_model(model, X_test, Y_test, category_names):
     Y_pred = model.predict(X_test)
     Y_pred_df = pd.DataFrame(Y_pred, columns = category_names)
 
+    macro_avg_results = defaultdict(dict)
+    weighted_avg_results = defaultdict(dict)
     for column in category_names:
+        report = classification_report(Y_test[column], Y_pred_df[column], output_dict=True)
+        weighted_avg_results[column] = report['weighted avg']
+        macro_avg_results[column] = report['macro avg']
+
         print('Report for ' + column + ' category')
-        print(classification_report(Y_test[column], Y_pred_df[column]))
+        print(report)
+    
+    if (test_name == None):
+        test_name = 'testUnnamed'
+
+    print('------------')
+    print(weighted_avg_results)
+    macro_avg_results_df = pd.DataFrame.from_dict(macro_avg_results, orient='index')
+    weighted_avg_results_df = pd.DataFrame.from_dict(weighted_avg_results, orient='index')
+
+    with open('tests/' + test_name + '_weightedAvg', 'w') as fid:
+        print(weighted_avg_results_df.to_markdown(), file=fid)
+
+    with open('tests/' + test_name + '_macroAvg', 'w') as fid:
+        print(macro_avg_results_df.to_markdown(), file=fid)
 
 
 def save_model(model, model_filepath):
     joblib.dump(model, open(model_filepath, 'wb'))
 
 
+# def tokenize(text):
+#     lemmatizer = WordNetLemmatizer()
+#     stemmer = PorterStemmer()
+
+#     text = text.lower()
+#     text = re.sub("[^a-zA-Z0-9]", " ", text)
+
+#     words_list = word_tokenize(text)
+#     stopwords_list = stopwords.words('english')
+
+#     words_list = [word for word in words_list if word not in stopwords_list]
+
+#     words_list = [lemmatizer.lemmatize(word) for word in words_list]
+#     words_list = [lemmatizer.lemmatize(word, pos='v') for word in words_list]
+
+#     words_list = [stemmer.stem(word) for word in words_list]
+
+#     return words_list
+
+
 def main():
     if len(sys.argv) >= 3:
         start_time = time.time()
 
-
-        # nounProportion = CapitalWordsCount()
-        # print('-----')
-        # print(nounProportion.transform(['I am in Romania and starving, at the University we need food and water']))
-
-        database_filepath, model_filepath, test_description = sys.argv[1:]
+        database_filepath, model_filepath, test_description, test_name = sys.argv[1:]
         print('Test description:\n')
         print(test_description)
         print ('\n\n')
@@ -128,7 +171,7 @@ def main():
         print("\n The best parameters across ALL searched params:\n", model.best_params_)
         
         print('Evaluating model...')
-        evaluate_model(model, X_test, Y_test, category_names)
+        evaluate_model(model, X_test, Y_test, category_names, test_name)
 
         print('Saving model...\n    MODEL: {}'.format(model_filepath))
         save_model(model, model_filepath)
