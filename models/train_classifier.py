@@ -67,18 +67,22 @@ def build_model(file):
             ('wordsCount', WordsCount()),
             ('capitalWordsCount', CapitalWordsCount())
         ])),
-        ('clf', MultiOutputClassifier(RandomForestClassifier(n_jobs=n_cpu - 1)))
+        ('clf', MultiOutputClassifier(KNeighborsClassifier(n_jobs=n_cpu - 1)))
+        # ('clf', MultiOutputClassifier(RandomForestClassifier(n_jobs=n_cpu - 1)))
     ])
 
-    pipeline.get_params()
+    print(pipeline.get_params())
+
+    # Parameters for RandomForestClassifier
+    # parameters = {
+    #     'clf__estimator__n_estimators': [100, 200],
+    #     'clf__estimator__min_samples_split': [2, 5, 10],
+    #     'clf__estimator__max_depth': [10, 50, None],
+    #     'clf__estimator__bootstrap': [True, False],
+    # }
 
     parameters = {
-        # 'clf__estimator__n_estimators': [50, 100, 200],
-        # 'clf__estimator__min_samples_split': [2, 5, 10],
-        # # 'clf__estimator__min_samples_leaf': [1, 2, 4],
-        # 'clf__estimator__max_depth': [10, 50, None],
-        # 'clf__estimator__bootstrap': [True, False],
-        # # 'clf__estimator__max_features': ['sqrt', 'log2', None],
+        
     }
 
     print_("\nParameters: {}\n".format(parameters), file=file)

@@ -55,16 +55,25 @@ Parameters: {}
 2. testRandomSearch2
 GridSearch; RandomForestClassifier; TfidfVectorizer; NounProportion, WordsCount, CapitalWordsCount transformers
 
-Parameters:
-{
-    'clf__estimator__n_estimators': [50, 100, 200, 300],
+Parameters: {}
+
+Similar results to testRandomSearch1
+
+3. testRandomSearch3
+GridSearch; RandomForestClassifier; TfidfVectorizer; NounProportion, WordsCount, CapitalWordsCount transformers; Parameters
+
+Parameters: {
+    'clf__estimator__n_estimators': [100, 200],
     'clf__estimator__min_samples_split': [2, 5, 10],
     'clf__estimator__max_depth': [10, 50, None],
     'clf__estimator__bootstrap': [True, False],
 }
 
-3. 
+The best parameters across ALL searched params: {'clf__estimator__bootstrap': False, 'clf__estimator__max_depth': None, 'clf__estimator__min_samples_split': 2, 'clf__estimator__n_estimators': 200}
 
+The results are in general better that in testRandomSearch2, but not significantly.
+
+4. 
 
 Personal obervations:
 1. Training data set is imbalanced
