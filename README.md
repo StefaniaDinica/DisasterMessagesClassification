@@ -46,13 +46,27 @@ Fix: Drop them
 
 ### Notes
 Several tests have been done in order to train the best model. The results of the tests can be found on /tests folder.
-1. test1
+1. testRandomSearch1
 
-GridSearch; RandomForestClassifier; TfidfVectorizer; no custom transformers
+GridSearch; RandomForestClassifier; TfidfVectorizer; NounProportion, WordsCount, CapitalWordsCount transformers
 
-Parameters: {'clf__estimator__n_estimators': [50, 100, 200, 300], 'clf__estimator__min_samples_split': [2, 5, 10], 'clf__estimator__max_depth': [10, 50, None], 'clf__estimator__bootstrap': [True, False]}
+Parameters: {}
 
-Results: 
-The best parameters across ALL searched params:
-{'clf__estimator__bootstrap': False, 'clf__estimator__max_depth': None, 'clf__estimator__min_samples_split': 2, 'clf__estimator__n_estimators': 200}
+2. testRandomSearch2
+GridSearch; RandomForestClassifier; TfidfVectorizer; NounProportion, WordsCount, CapitalWordsCount transformers
+
+Parameters:
+{
+    'clf__estimator__n_estimators': [50, 100, 200, 300],
+    'clf__estimator__min_samples_split': [2, 5, 10],
+    'clf__estimator__max_depth': [10, 50, None],
+    'clf__estimator__bootstrap': [True, False],
+}
+
+3. 
+
+
+Personal obervations:
+1. Training data set is imbalanced
+As it can be seen in the barchart, most of the data are in "related" and 'aid_related' categories. Also, the categories containing the majority of the data ('related', 'aid_related', 'direct_report', 'request', 'other_aid') have very subjective and vague names so it is unclear for me the type of the help the people need. The model is biased by 'related' category.
 

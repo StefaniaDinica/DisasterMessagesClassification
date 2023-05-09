@@ -1,3 +1,7 @@
+from transformers.WordsCount import WordsCount
+from transformers.NounProportion import NounProportion
+from transformers.CapitalWordsCount import CapitalWordsCount
+from utils.tokenize import tokenize
 import json
 import plotly
 import pandas as pd
@@ -13,16 +17,12 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 nltk.download(['punkt', 'stopwords', 'wordnet', 'averaged_perceptron_tagger'])
 
-from utils.tokenize import tokenize
-from transformers.CapitalWordsCount import CapitalWordsCount
-from transformers.NounProportion import NounProportion
-from transformers.WordsCount import WordsCount
 
 app = Flask(__name__)
 
 # load data
 engine = create_engine('sqlite:///../data/DisasterResponse.db')
-df = pd.read_sql_table('InsertTableName', con=engine.connect())
+df = pd.read_sql_table('MessagesCategories', con=engine.connect())
 
 # load model
 model = joblib.load("../models/classifier.pkl")
@@ -32,14 +32,22 @@ model = joblib.load("../models/classifier.pkl")
 @app.route('/')
 @app.route('/index')
 def index():
-    
+
     # extract data needed for visuals
-    # TODO: Below is an example - modify to extract data for your own visuals
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
-    
-    # create visuals
-    # TODO: Below is an example - modify to create your own visuals
+
+    category_names = df.drop(
+        columns=['id', 'message', 'original', 'genre']).columns
+    category_counts = df[category_names].sum().sort_values()
+
+    direct = df[df['genre'] == 'direct'][category_names].sum(
+        axis=1).value_counts().sort_index()
+    news = df[df['genre'] == 'news'][category_names].sum(
+        axis=1).value_counts().sort_index()
+    social = df[df['genre'] == 'social'][category_names].sum(
+        axis=1).value_counts().sort_index()
+
     graphs = [
         {
             'data': [
@@ -58,13 +66,61 @@ def index():
                     'title': "Genre"
                 }
             }
-        }
+        },
+        {
+
+            'data': [
+                Bar(
+                    x=category_counts.index,
+                    y=category_counts
+                )
+            ],
+
+            'layout': {
+                'title': 'Number of messages by category',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': ""
+                }
+            }
+        },
+        {
+            'data': [
+                Bar(
+                    name="direct",
+                    x=direct.index,
+                    y=direct
+                ),
+                Bar(
+                    name="news",
+                    x=news.index,
+                    y=news
+                ),
+                Bar(
+                    name="social",
+                    x=social.index,
+                    y=social
+                )
+            ],
+
+            'layout': {
+                'title': 'Number of messages by the number of categories assigned, grouped by genre',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Number of categories assigned"
+                }
+            }
+        },
     ]
-    
+
     # encode plotly graphs in JSON
     ids = ["graph-{}".format(i) for i, _ in enumerate(graphs)]
     graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
-    
+
     # render web page with plotly graphs
     return render_template('master.html', ids=ids, graphJSON=graphJSON)
 
@@ -73,13 +129,13 @@ def index():
 @app.route('/go')
 def go():
     # save user input in query
-    query = request.args.get('query', '') 
+    query = request.args.get('query', '')
 
     # use model to predict classification for query
     classification_labels = model.predict([query])[0]
     classification_results = dict(zip(df.columns[4:], classification_labels))
 
-    # This will render the go.html Please see that file. 
+    # This will render the go.html Please see that file.
     return render_template(
         'go.html',
         query=query,

@@ -6,8 +6,6 @@ from utils.tokenize import tokenize
 import sys
 from sqlalchemy import create_engine
 import pandas as pd
-import re
-import nltk
 import joblib
 import time
 import os
@@ -18,11 +16,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from sklearn.model_selection import GridSearchCV
-from nltk.stem.wordnet import WordNetLemmatizer
-from nltk.stem.porter import PorterStemmer
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
-nltk.download(['punkt', 'stopwords', 'wordnet', 'averaged_perceptron_tagger'])
+from sklearn.neighbors import KNeighborsClassifier
 
 def load_data(database_filepath, file):
     '''Reads data from the database and loads it into dataframes
@@ -76,15 +70,16 @@ def build_model(file):
         ('clf', MultiOutputClassifier(RandomForestClassifier(n_jobs=n_cpu - 1)))
     ])
 
-    # parameters = {
-    #     'clf__estimator__n_estimators': [50, 100, 200, 300],
-    #     'clf__estimator__min_samples_split': [2, 5, 10],
-    #     # 'clf__estimator__min_samples_leaf': [1, 2, 4],
-    #     'clf__estimator__max_depth': [10, 50, None],
-    #     'clf__estimator__bootstrap': [True, False],
-    #     # 'clf__estimator__max_features': ['sqrt', 'log2', None],
-    # }
-    parameters = {}
+    pipeline.get_params()
+
+    parameters = {
+        # 'clf__estimator__n_estimators': [50, 100, 200],
+        # 'clf__estimator__min_samples_split': [2, 5, 10],
+        # # 'clf__estimator__min_samples_leaf': [1, 2, 4],
+        # 'clf__estimator__max_depth': [10, 50, None],
+        # 'clf__estimator__bootstrap': [True, False],
+        # # 'clf__estimator__max_features': ['sqrt', 'log2', None],
+    }
 
     print_("\nParameters: {}\n".format(parameters), file=file)
 
@@ -182,7 +177,7 @@ def main():
 
         model.fit(X_train, Y_train)
 
-        print_('\nThe best parameters across ALL searched params: \n', model.best_params_)
+        print_('\nThe best parameters across ALL searched params: {}\n'.format(model.best_params_), file)
 
         evaluate_model(model, X_test, Y_test, category_names, test_name, file)
 
