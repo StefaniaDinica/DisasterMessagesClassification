@@ -1,3 +1,8 @@
+from collections import defaultdict
+from transformers.WordsCount import WordsCount
+from transformers.NounProportion import NounProportion
+from transformers.CapitalWordsCount import CapitalWordsCount
+from utils.tokenize import tokenize
 import sys
 from sqlalchemy import create_engine
 import pandas as pd
@@ -13,22 +18,15 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from sklearn.model_selection import GridSearchCV
-# from ..transformers import NounProportion, CapitalWordsCount, WordsCount
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.stem.porter import PorterStemmer
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 nltk.download(['punkt', 'stopwords', 'wordnet', 'averaged_perceptron_tagger'])
-# from ..utils.tokenize import tokenize
-from utils.tokenize import tokenize
-from transformers.CapitalWordsCount import CapitalWordsCount
-from transformers.NounProportion import NounProportion
-from transformers.WordsCount import WordsCount
-from collections import defaultdict
 
-def load_data(database_filepath):
+def load_data(database_filepath, file):
     '''Reads data from the database and loads it into dataframes
-    
+
     Args:
     database_filepath (string) - path to the database file
 
@@ -37,7 +35,9 @@ def load_data(database_filepath):
     Y - dataframe containing all categories columns;
     category_names - list with all the categories names
     '''
-    engine = create_engine('sqlite:///' + database_filepath)
+    print_('Loading data from {} database'.format(database_filepath), file)
+
+    engine = create_engine('sqlite:///{}'.format(database_filepath))
     df = pd.read_sql_table('MessagesCategories', con=engine.connect())
 
     X = df['message']
@@ -46,9 +46,10 @@ def load_data(database_filepath):
 
     return X, Y, category_names
 
-def build_model():
+
+def build_model(file):
     '''Builds the model using a Pipeline consisting of TfidfVectorizer, MultiOutputClassifier, RandomForestClassifier
-    
+
     Args:
     None
 
@@ -56,7 +57,14 @@ def build_model():
     cv - the model obtained by performing a GridSearchCV over the pipeline
     '''
     n_cpu = os.cpu_count()
-    print("Number of CPUs in the system: %s. Will use %s." % (n_cpu, (n_cpu - 1)))
+
+    print('\nBuilding the model...\n')
+    print_('\nNumber of CPUs in the system: %s. Will use %s for the classifier.\n' %
+              (n_cpu, (n_cpu - 1)), file)
+    
+    if file:
+        print('\nNumber of CPUs in the system: %s. Will use %s for the classifier.\n' %
+            (n_cpu, (n_cpu - 1)))
 
     pipeline = Pipeline([
         ('features', FeatureUnion([
@@ -78,16 +86,16 @@ def build_model():
     # }
     parameters = {}
 
-    print("Parameters: %s" % parameters)
+    print_("\nParameters: {}\n".format(parameters), file=file)
 
     cv = GridSearchCV(pipeline, param_grid=parameters, cv=2)
 
     return cv
 
 
-def evaluate_model(model, X_test, Y_test, category_names, test_name):
+def evaluate_model(model, X_test, Y_test, category_names, test_name, file):
     '''Evaluates a model by displaying the classification reports for all the categories
-    
+
     Args:
     model - the model to evaluate
     X_test - the input dataframe to test
@@ -97,96 +105,105 @@ def evaluate_model(model, X_test, Y_test, category_names, test_name):
     Returns:
     None
     '''
+    print('\nEvaluating the model...\n', file)
+
     Y_pred = model.predict(X_test)
-    Y_pred_df = pd.DataFrame(Y_pred, columns = category_names)
+    Y_pred_df = pd.DataFrame(Y_pred, columns=category_names)
 
-    macro_avg_results = defaultdict(dict)
-    weighted_avg_results = defaultdict(dict)
-    for column in category_names:
-        report_dict = classification_report(Y_test[column], Y_pred_df[column], output_dict=True)
-        report = classification_report(Y_test[column], Y_pred_df[column])
+    if test_name and file:
+        macro_avg_results = defaultdict(dict)
+        weighted_avg_results = defaultdict(dict)
 
-        report_dict['weighted avg'].pop('support', None)
-        report_dict['macro avg'].pop('support', None)
-        weighted_avg_results[column] = report_dict['weighted avg']
-        macro_avg_results[column] = report_dict['macro avg']
+        for column in category_names:
+            report = classification_report(Y_test[column], Y_pred_df[column])
+            report_dict = classification_report(
+                Y_test[column], Y_pred_df[column], output_dict=True)
 
-        print('Report for ' + column + ' category')
-        print(report)
-    
-    if (test_name == None):
-        test_name = 'testUnnamed'
+            report_dict['weighted avg'].pop('support', None)
+            report_dict['macro avg'].pop('support', None)
+            weighted_avg_results[column] = report_dict['weighted avg']
+            macro_avg_results[column] = report_dict['macro avg']
 
-    macro_avg_results_df = pd.DataFrame.from_dict(macro_avg_results, orient='index')
-    weighted_avg_results_df = pd.DataFrame.from_dict(weighted_avg_results, orient='index')
+            print_('Report for {} category'.format(column), file)
+            print_(report, file)
 
-    with open('tests/' + test_name + '_weightedAvg.md', 'w') as fid:
-        print(weighted_avg_results_df.to_markdown(), file=fid)
+        macro_avg_results_df = pd.DataFrame.from_dict(
+            macro_avg_results, orient='index')
+        weighted_avg_results_df = pd.DataFrame.from_dict(
+            weighted_avg_results, orient='index')
 
-    with open('tests/' + test_name + '_macroAvg.md', 'w') as fid:
-        print(macro_avg_results_df.to_markdown(), file=fid)
+        with open('tests/{}_weightedAvg.md'.format(test_name), 'w') as fid:
+            print_(weighted_avg_results_df.to_markdown(), fid)
+
+        with open('tests/{}_macroAvg.md'.format(test_name), 'w') as fid:
+            print_(macro_avg_results_df.to_markdown(), fid)
+    else:
+        for column in category_names:
+            report = classification_report(Y_test[column], Y_pred_df[column])
+
+            print('Report for {} category'.format(column))
+            print(report)
+
+
+def print_(text, file):
+    if file:
+        print(text, file=file)
+    else:
+        print(text)
 
 
 def save_model(model, model_filepath):
+    print('\nSaving model to {}\n'.format(model_filepath))
+
     joblib.dump(model, open(model_filepath, 'wb'))
 
 
-# def tokenize(text):
-#     lemmatizer = WordNetLemmatizer()
-#     stemmer = PorterStemmer()
-
-#     text = text.lower()
-#     text = re.sub("[^a-zA-Z0-9]", " ", text)
-
-#     words_list = word_tokenize(text)
-#     stopwords_list = stopwords.words('english')
-
-#     words_list = [word for word in words_list if word not in stopwords_list]
-
-#     words_list = [lemmatizer.lemmatize(word) for word in words_list]
-#     words_list = [lemmatizer.lemmatize(word, pos='v') for word in words_list]
-
-#     words_list = [stemmer.stem(word) for word in words_list]
-
-#     return words_list
-
-
 def main():
-    if len(sys.argv) >= 3:
+    if len(sys.argv) == 3 or len(sys.argv) == 5:
         start_time = time.time()
 
-        database_filepath, model_filepath, test_description, test_name = sys.argv[1:]
-        print('Test description:\n')
-        print(test_description)
-        print ('\n\n')
+        file = None
+        test_name = None
+        if len(sys.argv) == 3:
+            database_filepath, model_filepath = sys.argv[1:]
+        elif len(sys.argv) == 5:
+            database_filepath, model_filepath, test_description, test_name = sys.argv[1:]
+            file = open('tests/{}_details.txt'.format(test_name), 'w')
+            print_('Test description: {}\n'.format(test_description), file)
 
-        print('Loading data...\n    DATABASE: {}'.format(database_filepath))
-        X, Y, category_names = load_data(database_filepath)
-        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.33)
+        X, Y, category_names = load_data(database_filepath, file)
+
+        X_train, X_test, Y_train, Y_test = train_test_split(
+            X, Y, test_size=0.33)
         
-        print('Building model...')
-        model = build_model()
+        model = build_model(file)
 
-        print('Training model...')
+        print('\nTraining the model...\n')
+
         model.fit(X_train, Y_train)
 
-        print("\n The best parameters across ALL searched params:\n", model.best_params_)
-        
-        print('Evaluating model...')
-        evaluate_model(model, X_test, Y_test, category_names, test_name)
+        print_('\nThe best parameters across ALL searched params: \n', model.best_params_)
 
-        print('Saving model...\n    MODEL: {}'.format(model_filepath))
+        evaluate_model(model, X_test, Y_test, category_names, test_name, file)
+
         save_model(model, model_filepath)
 
-        print('Trained model saved!')
         end_time = time.time()
 
-        print('Execution time: %s minutes' % ((end_time - start_time) / 60))
+        print_('\nExecution time: {} minutes\n'.format((end_time - start_time) / 60), file)
+
+        if file:
+            print('\nExecution time: {} minutes\n'.format((end_time - start_time) / 60))
+
     else:
-        print('Please provide the filepath of the disaster messages database '\
-              'as the first argument and the filepath of the pickle file to '\
-              'save the model to as the second argument. \n\nExample: python '\
-              'train_classifier.py ../data/DisasterResponse.db classifier.pkl')
+        print('Please provide the filepath of the disaster messages database '
+              'as the first argument, the filepath of the pickle file to '
+              'save the model to as the second argument, the test name as ' 
+              'the third argument (optional) and the test description as the fourth '
+              'argument (optional).\n\nExample:\npython train_classifier.py ' 
+              '../data/DisasterResponse.db classifier.pkl "Test using RandomSearch" '
+              'testRandomSearch\npython train_classifier.py ' 
+              '../data/DisasterResponse.db classifier.pkl')
 
 
 if __name__ == '__main__':
