@@ -48,7 +48,7 @@ Fix: Drop them
 Several tests have been done in order to train the best model. The results of the tests can be found on /tests folder.
 1. testRandomSearch1
 
-GridSearch; RandomForestClassifier; TfidfVectorizer; NounProportion, WordsCount, CapitalWordsCount transformers
+GridSearch; RandomForestClassifier; TfidfVectorizer; no custom transformers
 
 Parameters: {}
 
@@ -73,7 +73,15 @@ The best parameters across ALL searched params: {'clf__estimator__bootstrap': Fa
 
 The results are in general better that in testRandomSearch2, but not significantly.
 
-4. 
+4. testKNeighbors4
+GridSearch; KNeighbors; TfidfVectorizer; no custom transformers; no Parameters
+
+The results are much more poorer than in testRandomSearch1
+
+5. testKNeighbors5
+GridSearch; KNeighbors; TfidfVectorizer; NounProportion, WordsCount, CapitalWordsCount transformers; no Parameters
+
+The results are better for KNeighbors using the custom transformers
 
 Personal obervations:
 1. Training data set is imbalanced

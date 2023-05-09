@@ -81,8 +81,11 @@ def build_model(file):
     #     'clf__estimator__bootstrap': [True, False],
     # }
 
+    # Parameters for KNeighborsClassifier
     parameters = {
-        
+        'clf__estimator__n_neighbors': [5, 10, 20, 30],
+        'clf__estimator__leaf_size': [15, 30, 50],
+        'clf__estimator__p': [1, 2]
     }
 
     print_("\nParameters: {}\n".format(parameters), file=file)

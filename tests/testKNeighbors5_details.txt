@@ -1,0 +1,365 @@
+Test description: GridSearch; KNeighborsClassifier; TfidfVectorizer; NounProportion, WordsCount, CapitalWordsCount transformers; Parameters
+
+Loading data from data/DisasterResponse.db database
+
+Number of CPUs in the system: 8. Will use 7 for the classifier.
+
+
+Parameters: {}
+
+
+The best parameters across ALL searched params: {}
+
+Report for related category
+              precision    recall  f1-score   support
+
+           0       0.51      0.22      0.31      1934
+           1       0.81      0.94      0.87      6717
+
+    accuracy                           0.78      8651
+   macro avg       0.66      0.58      0.59      8651
+weighted avg       0.74      0.78      0.74      8651
+
+Report for request category
+              precision    recall  f1-score   support
+
+           0       0.87      0.93      0.90      7133
+           1       0.53      0.35      0.42      1518
+
+    accuracy                           0.83      8651
+   macro avg       0.70      0.64      0.66      8651
+weighted avg       0.81      0.83      0.82      8651
+
+Report for offer category
+              precision    recall  f1-score   support
+
+           0       0.99      1.00      1.00      8603
+           1       0.00      0.00      0.00        48
+
+    accuracy                           0.99      8651
+   macro avg       0.50      0.50      0.50      8651
+weighted avg       0.99      0.99      0.99      8651
+
+Report for aid_related category
+              precision    recall  f1-score   support
+
+           0       0.68      0.66      0.67      4984
+           1       0.55      0.57      0.56      3667
+
+    accuracy                           0.62      8651
+   macro avg       0.61      0.62      0.61      8651
+weighted avg       0.62      0.62      0.62      8651
+
+Report for medical_help category
+              precision    recall  f1-score   support
+
+           0       0.92      0.99      0.95      7924
+           1       0.33      0.05      0.08       727
+
+    accuracy                           0.91      8651
+   macro avg       0.62      0.52      0.52      8651
+weighted avg       0.87      0.91      0.88      8651
+
+Report for medical_products category
+              precision    recall  f1-score   support
+
+           0       0.95      1.00      0.97      8195
+           1       0.46      0.04      0.07       456
+
+    accuracy                           0.95      8651
+   macro avg       0.71      0.52      0.52      8651
+weighted avg       0.92      0.95      0.93      8651
+
+Report for search_and_rescue category
+              precision    recall  f1-score   support
+
+           0       0.97      1.00      0.99      8402
+           1       0.60      0.01      0.02       249
+
+    accuracy                           0.97      8651
+   macro avg       0.79      0.51      0.50      8651
+weighted avg       0.96      0.97      0.96      8651
+
+Report for security category
+              precision    recall  f1-score   support
+
+           0       0.98      1.00      0.99      8483
+           1       0.00      0.00      0.00       168
+
+    accuracy                           0.98      8651
+   macro avg       0.49      0.50      0.50      8651
+weighted avg       0.96      0.98      0.97      8651
+
+Report for military category
+              precision    recall  f1-score   support
+
+           0       0.97      1.00      0.98      8351
+           1       0.31      0.01      0.03       300
+
+    accuracy                           0.96      8651
+   macro avg       0.64      0.51      0.50      8651
+weighted avg       0.94      0.96      0.95      8651
+
+Report for water category
+              precision    recall  f1-score   support
+
+           0       0.94      0.99      0.96      8069
+           1       0.45      0.12      0.19       582
+
+    accuracy                           0.93      8651
+   macro avg       0.69      0.55      0.58      8651
+weighted avg       0.91      0.93      0.91      8651
+
+Report for food category
+              precision    recall  f1-score   support
+
+           0       0.90      0.98      0.94      7607
+           1       0.52      0.19      0.28      1044
+
+    accuracy                           0.88      8651
+   macro avg       0.71      0.58      0.61      8651
+weighted avg       0.85      0.88      0.86      8651
+
+Report for shelter category
+              precision    recall  f1-score   support
+
+           0       0.92      0.98      0.95      7854
+           1       0.38      0.11      0.17       797
+
+    accuracy                           0.90      8651
+   macro avg       0.65      0.54      0.56      8651
+weighted avg       0.87      0.90      0.88      8651
+
+Report for clothing category
+              precision    recall  f1-score   support
+
+           0       0.98      1.00      0.99      8504
+           1       0.80      0.03      0.05       147
+
+    accuracy                           0.98      8651
+   macro avg       0.89      0.51      0.52      8651
+weighted avg       0.98      0.98      0.98      8651
+
+Report for money category
+              precision    recall  f1-score   support
+
+           0       0.98      1.00      0.99      8452
+           1       0.33      0.01      0.01       199
+
+    accuracy                           0.98      8651
+   macro avg       0.66      0.50      0.50      8651
+weighted avg       0.96      0.98      0.97      8651
+
+Report for missing_people category
+              precision    recall  f1-score   support
+
+           0       0.99      1.00      1.00      8568
+           1       0.00      0.00      0.00        83
+
+    accuracy                           0.99      8651
+   macro avg       0.50      0.50      0.50      8651
+weighted avg       0.98      0.99      0.99      8651
+
+Report for refugees category
+              precision    recall  f1-score   support
+
+           0       0.97      1.00      0.98      8375
+           1       0.29      0.02      0.04       276
+
+    accuracy                           0.97      8651
+   macro avg       0.63      0.51      0.51      8651
+weighted avg       0.95      0.97      0.95      8651
+
+Report for death category
+              precision    recall  f1-score   support
+
+           0       0.95      1.00      0.97      8241
+           1       0.29      0.03      0.06       410
+
+    accuracy                           0.95      8651
+   macro avg       0.62      0.52      0.52      8651
+weighted avg       0.92      0.95      0.93      8651
+
+Report for other_aid category
+              precision    recall  f1-score   support
+
+           0       0.87      0.97      0.92      7512
+           1       0.22      0.05      0.09      1139
+
+    accuracy                           0.85      8651
+   macro avg       0.55      0.51      0.50      8651
+weighted avg       0.79      0.85      0.81      8651
+
+Report for infrastructure_related category
+              precision    recall  f1-score   support
+
+           0       0.93      0.99      0.96      8072
+           1       0.25      0.02      0.04       579
+
+    accuracy                           0.93      8651
+   macro avg       0.59      0.51      0.50      8651
+weighted avg       0.89      0.93      0.90      8651
+
+Report for transport category
+              precision    recall  f1-score   support
+
+           0       0.95      1.00      0.98      8247
+           1       0.28      0.02      0.03       404
+
+    accuracy                           0.95      8651
+   macro avg       0.62      0.51      0.50      8651
+weighted avg       0.92      0.95      0.93      8651
+
+Report for buildings category
+              precision    recall  f1-score   support
+
+           0       0.95      1.00      0.97      8206
+           1       0.23      0.02      0.04       445
+
+    accuracy                           0.95      8651
+   macro avg       0.59      0.51      0.51      8651
+weighted avg       0.91      0.95      0.92      8651
+
+Report for electricity category
+              precision    recall  f1-score   support
+
+           0       0.98      1.00      0.99      8475
+           1       0.60      0.02      0.03       176
+
+    accuracy                           0.98      8651
+   macro avg       0.79      0.51      0.51      8651
+weighted avg       0.97      0.98      0.97      8651
+
+Report for tools category
+              precision    recall  f1-score   support
+
+           0       0.99      1.00      1.00      8571
+           1       0.00      0.00      0.00        80
+
+    accuracy                           0.99      8651
+   macro avg       0.50      0.50      0.50      8651
+weighted avg       0.98      0.99      0.99      8651
+
+Report for hospitals category
+              precision    recall  f1-score   support
+
+           0       0.99      1.00      0.99      8556
+           1       0.00      0.00      0.00        95
+
+    accuracy                           0.99      8651
+   macro avg       0.49      0.50      0.50      8651
+weighted avg       0.98      0.99      0.98      8651
+
+Report for shops category
+              precision    recall  f1-score   support
+
+           0       1.00      1.00      1.00      8609
+           1       0.00      0.00      0.00        42
+
+    accuracy                           1.00      8651
+   macro avg       0.50      0.50      0.50      8651
+weighted avg       0.99      1.00      0.99      8651
+
+Report for aid_centers category
+              precision    recall  f1-score   support
+
+           0       0.99      1.00      0.99      8540
+           1       0.00      0.00      0.00       111
+
+    accuracy                           0.99      8651
+   macro avg       0.49      0.50      0.50      8651
+weighted avg       0.97      0.99      0.98      8651
+
+Report for other_infrastructure category
+              precision    recall  f1-score   support
+
+           0       0.96      1.00      0.98      8269
+           1       0.19      0.01      0.02       382
+
+    accuracy                           0.95      8651
+   macro avg       0.57      0.50      0.50      8651
+weighted avg       0.92      0.95      0.93      8651
+
+Report for weather_related category
+              precision    recall  f1-score   support
+
+           0       0.79      0.86      0.82      6252
+           1       0.52      0.38      0.44      2399
+
+    accuracy                           0.73      8651
+   macro avg       0.65      0.62      0.63      8651
+weighted avg       0.71      0.73      0.72      8651
+
+Report for floods category
+              precision    recall  f1-score   support
+
+           0       0.92      0.99      0.96      7942
+           1       0.44      0.10      0.17       709
+
+    accuracy                           0.92      8651
+   macro avg       0.68      0.55      0.56      8651
+weighted avg       0.89      0.92      0.89      8651
+
+Report for storm category
+              precision    recall  f1-score   support
+
+           0       0.92      0.99      0.95      7855
+           1       0.48      0.11      0.18       796
+
+    accuracy                           0.91      8651
+   macro avg       0.70      0.55      0.57      8651
+weighted avg       0.88      0.91      0.88      8651
+
+Report for fire category
+              precision    recall  f1-score   support
+
+           0       0.99      1.00      0.99      8556
+           1       0.00      0.00      0.00        95
+
+    accuracy                           0.99      8651
+   macro avg       0.49      0.50      0.50      8651
+weighted avg       0.98      0.99      0.98      8651
+
+Report for earthquake category
+              precision    recall  f1-score   support
+
+           0       0.93      0.98      0.96      7865
+           1       0.63      0.26      0.37       786
+
+    accuracy                           0.92      8651
+   macro avg       0.78      0.62      0.66      8651
+weighted avg       0.90      0.92      0.90      8651
+
+Report for cold category
+              precision    recall  f1-score   support
+
+           0       0.98      1.00      0.99      8468
+           1       0.33      0.01      0.02       183
+
+    accuracy                           0.98      8651
+   macro avg       0.66      0.51      0.51      8651
+weighted avg       0.97      0.98      0.97      8651
+
+Report for other_weather category
+              precision    recall  f1-score   support
+
+           0       0.95      1.00      0.97      8180
+           1       0.13      0.01      0.02       471
+
+    accuracy                           0.94      8651
+   macro avg       0.54      0.50      0.49      8651
+weighted avg       0.90      0.94      0.92      8651
+
+Report for direct_report category
+              precision    recall  f1-score   support
+
+           0       0.85      0.92      0.88      6974
+           1       0.49      0.30      0.38      1677
+
+    accuracy                           0.80      8651
+   macro avg       0.67      0.61      0.63      8651
+weighted avg       0.78      0.80      0.79      8651
+
+
+Execution time: 7.152612400054932 minutes
+
