@@ -1,4 +1,4 @@
-Test description: GridSearch; RandomForestClassifier; TfidfVectorizer; no custom transformers
+Test description: GridSearch; RandomForestClassifier; TfidfVectorizer; no custom transformers; no parameters
 
 Loading data from data/DisasterResponse.db database
 

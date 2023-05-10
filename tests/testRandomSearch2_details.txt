@@ -1,4 +1,4 @@
-Test description: GridSearch; RandomForestClassifier; TfidfVectorizer; NounProportion, WordsCount, CapitalWordsCount transformers
+Test description: GridSearch; RandomForestClassifier; TfidfVectorizer; NounProportion, WordsCount, CapitalWordsCount transformers; no parameters
 
 Loading data from data/DisasterResponse.db database
 

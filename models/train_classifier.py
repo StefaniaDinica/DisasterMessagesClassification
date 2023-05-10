@@ -12,11 +12,12 @@ import os
 from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.multioutput import MultiOutputClassifier
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from sklearn.model_selection import GridSearchCV
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
 
 def load_data(database_filepath, file):
     '''Reads data from the database and loads it into dataframes
@@ -67,7 +68,8 @@ def build_model(file):
             ('wordsCount', WordsCount()),
             ('capitalWordsCount', CapitalWordsCount())
         ])),
-        ('clf', MultiOutputClassifier(KNeighborsClassifier(n_jobs=n_cpu - 1)))
+        ('clf', MultiOutputClassifier(SVC()))
+        # ('clf', MultiOutputClassifier(KNeighborsClassifier(n_jobs=n_cpu - 1)))
         # ('clf', MultiOutputClassifier(RandomForestClassifier(n_jobs=n_cpu - 1)))
     ])
 
@@ -82,11 +84,19 @@ def build_model(file):
     # }
 
     # Parameters for KNeighborsClassifier
+    # parameters = {
+    #     'clf__estimator__n_neighbors': [5, 10, 20, 30],
+    #     'clf__estimator__leaf_size': [15, 30, 50],
+    #     'clf__estimator__p': [1, 2]
+    # }
+
+    # Parameters for SVC
     parameters = {
-        'clf__estimator__n_neighbors': [5, 10, 20, 30],
-        'clf__estimator__leaf_size': [15, 30, 50],
-        'clf__estimator__p': [1, 2]
+        'clf__estimator__kernel': ['linear', 'poly', 'rbf', 'sigmoid', 'precomputed'],
+        'clf__estimator__gamma': ['scale', 'auto'],
+        'clf__estimator__degree': [2, 3, 4]
     }
+
 
     print_("\nParameters: {}\n".format(parameters), file=file)
 

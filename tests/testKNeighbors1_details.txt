@@ -1,4 +1,4 @@
-Test description: GridSearch; KNeighborsClassifier; no transformers; Parameters
+Test description: GridSearch; KNeighborsClassifier; no transformers; no parameters
 
 Loading data from data/DisasterResponse.db database
 

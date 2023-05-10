@@ -1,4 +1,4 @@
-Test description: GridSearch; KNeighborsClassifier; TfidfVectorizer; NounProportion, WordsCount, CapitalWordsCount transformers; Parameters
+Test description: GridSearch; KNeighborsClassifier; TfidfVectorizer; NounProportion, WordsCount, CapitalWordsCount transformers; no parameters
 
 Loading data from data/DisasterResponse.db database
 
