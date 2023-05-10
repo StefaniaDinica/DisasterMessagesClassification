@@ -3,7 +3,7 @@ Messages classification model and web app
 
 ## Overview
 
-![Tux, the Linux mascot](/assets/dataset-overview.png)
+![Dataset overview](/assets/dataset_overview.png)
 
 ## Instructions:
 1. Run the following commands in the project's root directory to set up your database and model.
