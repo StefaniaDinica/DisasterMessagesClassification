@@ -8,7 +8,9 @@ Messages classification model and web app
 ## Instructions:
 1. Run the following commands in the project's root directory to set up your database and model.
     - Add the project root to PYTHONPATH environment variable
-        `#Example MacOS: .zshrc`
+        
+        Example for MacOS (.zshrc):
+        
         `export PYTHONPATH=$PYTHONPATH:/Users/stefaniamindoiu/Workspace/Data/Project_Classify_Messages/DisasterMessagesClassification`
     - To run ETL pipeline that cleans data and stores in database
         `python data/process_data.py data/disaster_messages.csv data/disaster_categories.csv data/DisasterResponse.db`
@@ -57,9 +59,15 @@ GridSearch; RandomForestClassifier; TfidfVectorizer; no custom transformers; no 
 
 [testRandomSearch1_macroAvg.md](/tests/testRandomSearch1_macroAvg.md)
 
+[testRandomSearch1_weightedAvg.md](/tests/testRandomSearch1_weightedAvg.md)
+
 #### 2. testRandomSearch2
 
 GridSearch; RandomForestClassifier; TfidfVectorizer; NounProportion, WordsCount, CapitalWordsCount transformers
+
+[testRandomSearch2_macroAvg.md](/tests/testRandomSearch2_macroAvg.md)
+
+[testRandomSearch2_weightedAvg.md](/tests/testRandomSearch2_weightedAvg.md)
 
 
 Similar results to testRandomSearch1
@@ -87,16 +95,28 @@ The best parameters across ALL searched params:
 
 The results are in general better that in testRandomSearch2, but not significantly.
 
+[testRandomSearch3_macroAvg.md](/tests/testRandomSearch3_macroAvg.md)
+
+[testRandomSearch3_weightedAvg.md](/tests/testRandomSearch3_weightedAvg.md)
+
 #### 4. testKNeighbors4
 
 GridSearch; KNeighborsClassifier; TfidfVectorizer; no custom transformers; no parameters
 
 The results are much more poorer than in testRandomSearch1
 
+[testKNeighbors1_macroAvg.md](/tests/testKNeighbors1_macroAvg.md)
+
+[testKNeighbors1_weightedAvg.md](/tests/testKNeighbors1_weightedAvg.md)
+
 #### 5. testKNeighbors5
 GridSearch; KNeighborsClassifier; TfidfVectorizer; NounProportion, WordsCount, CapitalWordsCount transformers; no parameters
 
 The results are better for KNeighbors using the custom transformers
+
+[testKNeighbors2_macroAvg.md](/tests/testKNeighbors2_macroAvg.md)
+
+[testKNeighbors2_weightedAvg.md](/tests/testKNeighbors2_weightedAvg.md)
 
 #### 6. testKNeighbors6
 GridSearch; KNeighborsClassifier; TfidfVectorizer; NounProportion, WordsCount, CapitalWordsCount transformers
@@ -109,15 +129,27 @@ GridSearch; KNeighborsClassifier; TfidfVectorizer; NounProportion, WordsCount, C
 
 The results are poorer than in testRandomSearch3
 
+[testKNeighbors3_macroAvg.md](/tests/testKNeighbors3_macroAvg.md)
+
+[testKNeighbors3_weightedAvg.md](/tests/testKNeighbors3_weightedAvg.md)
+
 #### 7. testSVC7
 GridSearch; SVC; TfidfVectorizer; no transformers; no parameters
 
 These are the best obtained results.
 
+[testSVC1_macroAvg.md](/tests/testSVC1_macroAvg.md)
+
+[testSVC1_weightedAvg.md](/tests/testSVC1_weightedAvg.md)
+
 #### 8. testSVC8
 GridSearch; SVC; TfidfVectorizer; NounProportion, WordsCount, CapitalWordsCount transformers; no parameters
 
 The results are much more poorer than in testSVC7 -> SVC is better used without the custom transformers
+
+[testSVC2_macroAvg.md](/tests/testSVC2_macroAvg.md)
+
+[testSVC2_weightedAvg.md](/tests/testSVC2_weightedAvg.md)
 
 
 
@@ -126,5 +158,5 @@ The results are much more poorer than in testSVC7 -> SVC is better used without 
 
 As it can be seen in the barchart, most of the data are in "related" and 'aid_related' categories. Also, the categories containing the majority of the data ('related', 'aid_related', 'direct_report', 'request', 'other_aid') have very subjective and vague names so it is unclear for me the type of the help the people need. The model is biased by 'related' category.
 
-2. The best model was obtained with Support Vector Classifier algorithm.
+2. The best model was obtained with **Support Vector Classifier** algorithm.
 
