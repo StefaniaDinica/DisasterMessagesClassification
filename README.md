@@ -3,7 +3,7 @@ Messages classification model and web app
 
 ## Overview
 
-    ![Tux, the Linux mascot](/assets/dataset-overview.png)
+![Tux, the Linux mascot](/assets/dataset-overview.png)
 
 ## Instructions:
 1. Run the following commands in the project's root directory to set up your database and model.
@@ -54,6 +54,8 @@ Several tests have been done in order to train the best model. The results of th
 #### 1. testRandomSearch1
 
 GridSearch; RandomForestClassifier; TfidfVectorizer; no custom transformers; no parameters
+
+[testRandomSearch1_macroAvg.md](/tests/testRandomSearch1_macroAvg.md)
 
 #### 2. testRandomSearch2
 
