@@ -2,7 +2,7 @@
 Messages classification model and web app
 
 ## Overview of the app
-![Dataset overview](/assets/dataset_overview.png)
+![Dataset overview](/assets/app_overview.png)
 
 The web application is built with Flask.
 The model was built using [SVC](https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVC.html) algorithm.
@@ -23,6 +23,8 @@ The model was built using [SVC](https://scikit-learn.org/stable/modules/generate
         `python data/process_data.py data/disaster_messages.csv data/disaster_categories.csv data/DisasterResponse.db`
     - To run ML pipeline that trains classifier and saves
         `python models/train_classifier.py data/DisasterResponse.db models/classifier.pkl`
+    - Optionally, you can run ML pipeline that trains and saves the classifier and save the results to test files (specifying a test description and a test name). The test files will be saved in /tests folder.
+        `python models/train_classifier.py data/DisasterResponse.db models/classifier.pkl "This is a RandomSearch test" randomSearchTest`
 
 2. Go to `app` directory: `cd app`
 
@@ -43,6 +45,8 @@ The model was built using [SVC](https://scikit-learn.org/stable/modules/generate
     - the results of the tests done for obtaining the model with the best results
 - /transformers
     - custom transformers
+- requirements.txt
+    - depencencies that need to be installed
 
 ## Dataset cleanup
 After creating single columns for each category, and populating them with the appropriat numeric values, three issues were encountered:
@@ -59,7 +63,7 @@ Fix: Drop the column because it has no relevance
 Fix: Drop them
 
 ## Tests
-Several tests have been done in order to train the best model. The results of the tests can be found in /tests folder.
+Several tests with different classification algorithms have been done in order to train the best model. The results of the tests can be found in /tests folder.
 #### 1. testRandomSearch1
 
 GridSearch; RandomForestClassifier; TfidfVectorizer; no custom transformers; no parameters
@@ -100,30 +104,30 @@ The best parameters across ALL searched params:
         'clf__estimator__n_estimators': 200
     }
 
-The results are in general better that in testRandomSearch2, but not significantly.
-
 [testRandomSearch3_macroAvg.md](/tests/testRandomSearch3_macroAvg.md)
 
 [testRandomSearch3_weightedAvg.md](/tests/testRandomSearch3_weightedAvg.md)
+
+The results are in general better that in testRandomSearch2, but not significantly.
 
 #### 4. testKNeighbors1
 
 GridSearch; KNeighborsClassifier; TfidfVectorizer; no custom transformers; no parameters
 
-The results are much more poorer than in testRandomSearch1
-
 [testKNeighbors1_macroAvg.md](/tests/testKNeighbors1_macroAvg.md)
 
 [testKNeighbors1_weightedAvg.md](/tests/testKNeighbors1_weightedAvg.md)
 
+The results are much more poorer than in testRandomSearch1.
+
 #### 5. testKNeighbors2
 GridSearch; KNeighborsClassifier; TfidfVectorizer; NounProportion, WordsCount, CapitalWordsCount transformers; no parameters
-
-The results are better for KNeighbors using the custom transformers
 
 [testKNeighbors2_macroAvg.md](/tests/testKNeighbors2_macroAvg.md)
 
 [testKNeighbors2_weightedAvg.md](/tests/testKNeighbors2_weightedAvg.md)
+
+The results are better for KNeighbors using the custom transformers.
 
 #### 6. testKNeighbors3
 GridSearch; KNeighborsClassifier; TfidfVectorizer; NounProportion, WordsCount, CapitalWordsCount transformers
@@ -142,30 +146,29 @@ The best parameters across ALL searched params:
         'clf__estimator__p': 1
     }
 
-
-The results are poorer than in testRandomSearch3
-
 [testKNeighbors3_macroAvg.md](/tests/testKNeighbors3_macroAvg.md)
 
 [testKNeighbors3_weightedAvg.md](/tests/testKNeighbors3_weightedAvg.md)
 
+The results are poorer than in testRandomSearch3.
+
 #### 7. testSVC1
 GridSearch; SVC; TfidfVectorizer; no custom transformers; no parameters
-
-The results are better than for testRandomSearch1.
 
 [testSVC1_macroAvg.md](/tests/testSVC1_macroAvg.md)
 
 [testSVC1_weightedAvg.md](/tests/testSVC1_weightedAvg.md)
 
+The results are better than for testRandomSearch1.
+
 #### 8. testSVC2
 GridSearch; SVC; TfidfVectorizer; NounProportion, WordsCount, CapitalWordsCount transformers; no parameters
-
-The results are much more poorer than in testSVC7 -> SVC is better used without the custom transformers
 
 [testSVC2_macroAvg.md](/tests/testSVC2_macroAvg.md)
 
 [testSVC2_weightedAvg.md](/tests/testSVC2_weightedAvg.md)
+
+The results are much more poorer than in testSVC7 -> SVC is better used without the custom transformers.
 
 #### 9. testSVC3
 GridSearch; SVC; TfidfVectorizer; no custom transformers; Parameters
@@ -189,7 +192,7 @@ GridSearch; SVC; TfidfVectorizer; no custom transformers; Parameters
 
 [testSVC2_weightedAvg.md](/tests/testSVC2_weightedAvg.md)
 
-
+The best results in the experiment.
 
 ## Obervations:
 1. Training data set is imbalanced
