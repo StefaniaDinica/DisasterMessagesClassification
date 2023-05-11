@@ -1,6 +1,9 @@
 # Disaster Response Pipeline Project
 Messages classification model and web app
 
+## Github repository
+[https://github.com/StefaniaDinica/DisasterMessagesClassification](https://github.com/StefaniaDinica/DisasterMessagesClassification)
+
 ## Overview of the app
 ![Dataset overview](/assets/app_overview.png)
 
