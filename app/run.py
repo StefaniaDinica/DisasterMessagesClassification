@@ -1,21 +1,11 @@
-from transformers.WordsCount import WordsCount
-from transformers.NounProportion import NounProportion
-from transformers.CapitalWordsCount import CapitalWordsCount
-from utils.tokenize import tokenize
 import json
 import plotly
 import pandas as pd
 from flask import Flask
-from flask import render_template, request, jsonify
+from flask import render_template, request
 from plotly.graph_objs import Bar
 import joblib
 from sqlalchemy import create_engine
-import nltk
-from nltk.stem.wordnet import WordNetLemmatizer
-from nltk.stem.porter import PorterStemmer
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
-nltk.download(['punkt', 'stopwords', 'wordnet', 'averaged_perceptron_tagger'])
 
 
 app = Flask(__name__)

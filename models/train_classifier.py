@@ -19,6 +19,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 
+
 def load_data(database_filepath, file):
     '''Reads data from the database and loads it into dataframes
 
@@ -55,25 +56,25 @@ def build_model(file):
 
     print('\nBuilding the model...\n')
     print_('\nNumber of CPUs in the system: %s. Will use %s for the classifier.\n' %
-              (n_cpu, (n_cpu - 1)), file)
-    
+           (n_cpu, (n_cpu - 1)), file)
+
     if file:
         print('\nNumber of CPUs in the system: %s. Will use %s for the classifier.\n' %
-            (n_cpu, (n_cpu - 1)))
+              (n_cpu, (n_cpu - 1)))
 
     pipeline = Pipeline([
         ('features', FeatureUnion([
             ('trans', TfidfVectorizer(tokenizer=tokenize)),
-            ('nounProportion', NounProportion()),
-            ('wordsCount', WordsCount()),
-            ('capitalWordsCount', CapitalWordsCount())
+            # ('nounProportion', NounProportion()),
+            # ('wordsCount', WordsCount()),
+            # ('capitalWordsCount', CapitalWordsCount())
         ])),
         ('clf', MultiOutputClassifier(SVC()))
         # ('clf', MultiOutputClassifier(KNeighborsClassifier(n_jobs=n_cpu - 1)))
         # ('clf', MultiOutputClassifier(RandomForestClassifier(n_jobs=n_cpu - 1)))
     ])
 
-    print(pipeline.get_params())
+    #print(pipeline.get_params())
 
     # Parameters for RandomForestClassifier
     # parameters = {
@@ -91,14 +92,18 @@ def build_model(file):
     # }
 
     # Parameters for SVC
+    # parameters = {
+    #     'clf__estimator__kernel': ['linear', 'poly', 'rbf', 'sigmoid', 'precomputed'],
+    #     'clf__estimator__gamma': ['scale', 'auto'],
+    #     'clf__estimator__degree': [2, 3, 4]
+    # }
     parameters = {
-        'clf__estimator__kernel': ['linear', 'poly', 'rbf', 'sigmoid', 'precomputed'],
-        'clf__estimator__gamma': ['scale', 'auto'],
-        'clf__estimator__degree': [2, 3, 4]
+        'clf__estimator__degree': [2],
+        'clf__estimator__gamma': ['scale'],
+        'clf__estimator__kernel': ['linear']
     }
 
-
-    print_("\nParameters: {}\n".format(parameters), file=file)
+    #print_("\nParameters: {}\n".format(parameters), file=file)
 
     cv = GridSearchCV(pipeline, param_grid=parameters, cv=2)
 
@@ -187,14 +192,15 @@ def main():
 
         X_train, X_test, Y_train, Y_test = train_test_split(
             X, Y, test_size=0.33)
-        
+
         model = build_model(file)
 
         print('\nTraining the model...\n')
 
         model.fit(X_train, Y_train)
 
-        print_('\nThe best parameters across ALL searched params: {}\n'.format(model.best_params_), file)
+        print_('\nThe best parameters across ALL searched params: {}\n'.format(
+            model.best_params_), file)
 
         evaluate_model(model, X_test, Y_test, category_names, test_name, file)
 
@@ -202,19 +208,21 @@ def main():
 
         end_time = time.time()
 
-        print_('\nExecution time: {} minutes\n'.format((end_time - start_time) / 60), file)
+        print_('\nExecution time: {} minutes\n'.format(
+            (end_time - start_time) / 60), file)
 
         if file:
-            print('\nExecution time: {} minutes\n'.format((end_time - start_time) / 60))
+            print('\nExecution time: {} minutes\n'.format(
+                (end_time - start_time) / 60))
 
     else:
         print('Please provide the filepath of the disaster messages database '
               'as the first argument, the filepath of the pickle file to '
-              'save the model to as the second argument, the test name as ' 
+              'save the model to as the second argument, the test name as '
               'the third argument (optional) and the test description as the fourth '
-              'argument (optional).\n\nExample:\npython train_classifier.py ' 
+              'argument (optional).\n\nExample:\npython train_classifier.py '
               '../data/DisasterResponse.db classifier.pkl "Test using RandomSearch" '
-              'testRandomSearch\npython train_classifier.py ' 
+              'testRandomSearch\npython train_classifier.py '
               '../data/DisasterResponse.db classifier.pkl')
 
 
